@@ -8,9 +8,7 @@ class Worker():
         self.skills = skills
 
 
-def addToDB(name, url, skills, zipcode):
-    client = MongoClient()
-    db = client.test
+def addToDB(db, name, url, skills, zipcode):
     result = db.workers.insert_one(
         {
             "name" : name,
@@ -20,14 +18,12 @@ def addToDB(name, url, skills, zipcode):
         }
     )    
 
-def searchDB(skills, zipcode, skillMatchThreshold):
+def searchDB(db, skills, zipcode, skillMatchThreshold):
     w = []
 
-    client = MongoClient()
-    db = client.test
     cursor = db.workers.find({"zip" : zipcode})
     for document in cursor:
-        skillMatch = (double)len(skills & document.skills)/(double)len(skills)
+        skillMatch = len(list(set(skills) & set(document.skills)))//len(skills)
         if (skillMatch >= skillMatchThreshold):
             w.append(Worker(document.name, document.url, document.skills))
 
@@ -38,10 +34,16 @@ def displayToForm(lst):
         print("name: "+l.name+" || URL: "+l.url+" || skills: "+l.skills)
 
 def main():
+    client = MongoClient()
+    db = client.test
+    # filler data
+    addToDB(db, "Steve Rogers", "avengers.com/cap", ["shield throwing", "Java", "vigilante justice"], "20055")
+    addToDB(db, "Natasha Romanov", "avengers.com/widow", ["assassination", "snark", "CSS"], "20055")
+    addToDB(db, "Sam Wilson", "avengers.com/falcon", ["bird suit", "Java", "HTML", "CSS"], "20055")
     skills = ["CSS", "HTML", "Java"]
     zipcode = "20055"
     skillMatchThreshold = 0.5
-    matchedWorkers = searchDB(skills, zipcode, skillMatchThreshold)
+    matchedWorkers = searchDB(db, skills, zipcode, skillMatchThreshold)
     if (len(matchedWorkers) < 10):
         # new scrape
         # add to DB
