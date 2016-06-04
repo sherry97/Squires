@@ -41,6 +41,7 @@ def main():
     if (len(matchedWorkers) < 10):
         # new scrape
         # add to DB
+        pass
 
     displayToForm(w);
 
