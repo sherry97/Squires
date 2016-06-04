@@ -33,6 +33,10 @@ def searchDB(skills, zipcode, skillMatchThreshold):
 
     return w
 
+def displayToForm(lst):
+    for l in lst:
+        print("name: "+l.name+" || URL: "+l.url+" || skills: "+l.skills)
+
 def main():
     skills = ["CSS", "HTML", "Java"]
     zipcode = "20055"
