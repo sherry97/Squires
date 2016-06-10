@@ -1,6 +1,7 @@
 Squires Challenge
 ==========
 National Day of Civic Hacking
+
 June 2016
 
 Web crawl for potential employees with specific skills.
