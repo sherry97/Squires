@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#   launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mongodb.plist
+#   OR
+#   brew services start mongodb
 import bottle
 from pymongo import MongoClient
 import scrapy
@@ -14,8 +17,10 @@ def index():
     return bottle.template('views/search.tpl')
 
 @bottle.post('/searched')
-def added():
+def searched():
     parts = bottle.request.forms
+    # print(parts)
+    main()
     return parts.getunicode("skills")
 
 def addToDB(db, name, url, skills, zipcode):
@@ -37,15 +42,18 @@ def searchDB(db, skills, zipcode, skillMatchThreshold):
         if skillMatch >= skillMatchThreshold:
             try:
                 # print(document)
-                w.append(Worker(document['name'], document['URL'], document['skills']))
+                w.append([Worker(document['name'], document['URL'], document['skills']), skillMatch])
             except KeyError:
+                print('KeyError!')
                 continue
     return w
 
 def displayToForm(lst):
-    for l in lst:
-        print(l.name+"\t"+l.url)
+    for l, skillMatch in lst:
+        print(l.name+"\t"+l.url+"\t"+str(skillMatch))
         print(l.skills)
+
+    #   display to webpage
 
 def main():
     bottle.debug(True)
@@ -53,12 +61,16 @@ def main():
 
     client = MongoClient()
     db = client.test
-    # filler data
-    addToDB(db, "Steve Rogers", "avengers.com/cap", ["shield throwing", "Java", "vigilante justice"], "20055")
+    #
+    #   filler data
+    #
+    addToDB(db, "Steve Rogers", "avengers.com/cap", ["shield throwing", "Java"], "20055")
     addToDB(db, "Natasha Romanov", "avengers.com/widow", ["assassination", "snark", "CSS"], "20055")
     addToDB(db, "Sam Wilson", "avengers.com/falcon", ["bird suit", "Java", "HTML", "CSS"], "20055")
-    # /filler data
-    skills = added()
+    #
+    #   /filler data
+    #
+    skills = searched()
     zipcode = "20055"
     skillMatchThreshold = 0.5
     matchedWorkers = searchDB(db, skills, zipcode, skillMatchThreshold)
@@ -67,7 +79,7 @@ def main():
         # add to DB
         pass
 
-    displayToForm(matchedWorkers);
+    searched(matchedWorkers);
     client.drop_database(db)
 
 if __name__ == '__main__': main()
