@@ -23,7 +23,7 @@ def searched():
     prefSkills = parts.getunicode("preferred_skills")
     zipcode = parts.getunicode("zip")
     skillMatchThreshold = parts.getunicode("threshold")
-    matchedWorkers = searchDB(db, skills, zipcode, skillMatchThreshold)
+    matchedWorkers = searchDB(db, reqSkills, prefSkills, zipcode, skillMatchThreshold)
     if (len(matchedWorkers) < 10):
         # new scrape
         # add to DB
@@ -40,12 +40,14 @@ def addToDB(db, name, url, skills, zipcode):
         }
     )    
 
-def searchDB(db, skills, zipcode, skillMatchThreshold):
+def searchDB(db, reqSkills, prefSkills, zipcode, skillMatchThreshold):
     w = []
 
     cursor = db.workers.find({"zip" : zipcode})
     for document in cursor:
-        skillMatch = len(list(set(skills) & set(document['skills'])))/len(skills)
+        if len(list(set(reqSkills) & set(document['skills']))) < len(reqSkills):
+            continue
+        skillMatch = len(list(set(prefSkills) & set(document['skills'])))/len(prefSkills)
         if skillMatch >= skillMatchThreshold:
             try:
                 # print(document)
