@@ -19,9 +19,16 @@ def index():
 @bottle.post('/searched')
 def searched():
     parts = bottle.request.forms
-    # print(parts)
-    main()
-    return parts.getunicode("skills")
+    reqSkills = parts.getunicode("required_skills")
+    prefSkills = parts.getunicode("preferred_skills")
+    zipcode = parts.getunicode("zip")
+    skillMatchThreshold = parts.getunicode("threshold")
+    matchedWorkers = searchDB(db, skills, zipcode, skillMatchThreshold)
+    if (len(matchedWorkers) < 10):
+        # new scrape
+        # add to DB
+        pass
+    return bottle.template('views/output.tpl')
 
 def addToDB(db, name, url, skills, zipcode):
     result = db.workers.insert_one(
@@ -79,7 +86,7 @@ def main():
         # add to DB
         pass
 
-    searched(matchedWorkers);
+    searched(matchedWorkers)
     client.drop_database(db)
 
 if __name__ == '__main__': main()

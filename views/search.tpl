@@ -2,8 +2,10 @@
 
 <p>Choose skills and location:</p>
 <form method="post" action="/searched">
-  <label>Skills: <input name="skills" type="text"></label>
-  <label>Location: <input name="location" type="text"></label>
+  <label>Required skills: <input name="required_skills" type="text"></label>
+  <label>Preferred skills: <input name="preferred_skills" type="text"></label>
+  <label>Location (zipcode): <input name="zip" type="text"></label>
+  <label>Preferred skills match threshold: <input name="threshold" type="text"></label>
 
   <button type="submit">Submit</button>
 </form>
